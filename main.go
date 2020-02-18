@@ -11,7 +11,11 @@ import (
 )
 
 func main() {
-	var path, filePath, fileName, sheetName string
+	var rootPath string
+
+	var filePath, fileName, sheetName string
+
+	var column string
 
 	var length int
 
@@ -29,17 +33,17 @@ func main() {
 		Usage:     "some useful actions for excel files",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:        "path",
-				Aliases:     []string{"p"},
+				Name:        "root-path",
+				Aliases:     []string{"rp"},
 				Value:       "/Users/mklyy/Desktop/",
 				Usage:       "root path of pending files",
-				Destination: &path,
+				Destination: &rootPath,
 			},
 		},
 		Commands: []*cli.Command{
 			{
 				Name:    "split",
-				Aliases: []string{"sp"},
+				Aliases: []string{"s"},
 				Usage:   "split sheet into multiple files",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
@@ -72,12 +76,13 @@ func main() {
 					},
 				},
 				Action: func(c *cli.Context) error {
-					return commands.Split(path, fileName, sheetName, filePath, length)
+					return commands.Split(rootPath, fileName, sheetName, filePath, length)
 				},
 			},
 			{
+				// todo - unify mutiple files into one sheet
 				Name:    "unify",
-				Aliases: []string{"un"},
+				Aliases: []string{"u"},
 				Usage:   "unify sheets in multiple files into one sheet",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
@@ -97,6 +102,44 @@ func main() {
 				},
 				Action: func(c *cli.Context) error {
 					return commands.Unify(filePath, fileName)
+				},
+			},
+			{
+				Name:    "classify",
+				Aliases: []string{"c"},
+				Usage:   "classify data of sheet into multiple files with different value in a column",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "file-name",
+						Aliases:     []string{"fn"},
+						Value:       "test.xlsx",
+						Usage:       "name of pending files to be split",
+						Destination: &fileName,
+					},
+					&cli.StringFlag{
+						Name:        "sheet-name",
+						Aliases:     []string{"sn"},
+						Value:       "数据源",
+						Usage:       "name of file sheet to be split",
+						Destination: &sheetName,
+					},
+					&cli.StringFlag{
+						Name:        "sub-path",
+						Aliases:     []string{"sp"},
+						Value:       "/",
+						Usage:       "sub path of file to output",
+						Destination: &filePath,
+					},
+					&cli.StringFlag{
+						Name:        "column",
+						Aliases:     []string{"c"},
+						Value:       "A",
+						Usage:       "name of the column",
+						Destination: &column,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					return commands.Classify(rootPath, fileName, sheetName, filePath, column)
 				},
 			},
 		},

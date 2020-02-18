@@ -23,6 +23,7 @@ func Split(filePath string, inputFileName string, sheetName string, outputFilePa
 
 	total := len(sRows)
 
+	// make sure output file path exists
 	if err = os.MkdirAll(filePath+outputFilePath, os.ModePerm); err != nil {
 		return
 	}
@@ -30,7 +31,6 @@ func Split(filePath string, inputFileName string, sheetName string, outputFilePa
 	for i := 0; i <= total/length; i++ {
 		newFile := excelize.NewFile()
 		newSheet := newFile.NewSheet(sheetName)
-
 		// set title
 		newFile.SetSheetRow(sheetName, "A1", &sTitle)
 
