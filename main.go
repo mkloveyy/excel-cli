@@ -19,8 +19,6 @@ func main() {
 
 	var length int
 
-	var username string
-
 	excelCli := &cli.App{
 		Name:     "excel-cli",
 		Version:  "v1.0.0",
@@ -33,11 +31,12 @@ func main() {
 		},
 		Copyright: "(c) Authored By Mark Ma",
 		Usage:     "some useful actions for excel files",
+		// todo - why not work on windows?
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "root-path",
 				Aliases:     []string{"rp"},
-				Value:       "/Users/mklyy/Desktop/",
+				Value:       "",
 				Usage:       "root path of pending files",
 				Destination: &rootPath,
 			},
@@ -140,15 +139,14 @@ func main() {
 						Destination: &column,
 					},
 					&cli.StringFlag{
-						Name:        "username",
-						Aliases:     []string{"u"},
-						Value:       "",
-						Usage:       "user defined config",
-						Destination: &username,
+						Name:    "username",
+						Aliases: []string{"u"},
+						Value:   "",
+						Usage:   "user defined config",
 					},
 				},
 				Action: func(c *cli.Context) error {
-					return commands.Classify(rootPath, fileName, sheetName, filePath, column, username)
+					return commands.Classify(rootPath, fileName, sheetName, filePath, column)
 				},
 			},
 		},

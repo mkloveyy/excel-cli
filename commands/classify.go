@@ -9,7 +9,12 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
-func Classify(filePath string, inputFileName string, sheetName string, outputFilePath string, column string, username string) (err error) {
+type File struct {
+	file  *excelize.File
+	count int
+}
+
+func Classify(filePath string, inputFileName string, sheetName string, outputFilePath string, column string) (err error) {
 	if len(column) > 1 {
 		return errors.New("wrong column value")
 	}
@@ -24,8 +29,6 @@ func Classify(filePath string, inputFileName string, sheetName string, outputFil
 	sRows := f.GetRows(sheetName)
 	// get sheet title
 	sTitle := sRows[0]
-
-	//total := len(sRows)
 
 	// get the specific column and remove duplicate values
 	var columnList []string
@@ -55,25 +58,37 @@ func Classify(filePath string, inputFileName string, sheetName string, outputFil
 		return
 	}
 
-	// classify by diff column, file is named by column value
+	// cache all null files, file is named by column value
+	outFiles := make(map[string]File)
+
 	for _, columnValue := range columnList {
 		newFile := excelize.NewFile()
 		newSheet := newFile.NewSheet(sheetName)
 		// set title
 		newFile.SetSheetRow(sheetName, "A1", &sTitle)
-
-		k := 2
-
-		for j := 2; j < len(sRows); j++ {
-			if f.GetCellValue(sheetName, column+strconv.Itoa(j)) == columnValue {
-				newFile.SetSheetRow(sheetName, "A"+strconv.Itoa(k), &sRows[j-1])
-				k++
-			}
-		}
-
 		newFile.SetActiveSheet(newSheet)
 
-		if err = newFile.SaveAs(filePath + outputFilePath + columnValue + ".xlsx"); err != nil {
+		outFiles[columnValue] = File{file: newFile, count: 2}
+	}
+
+	// classify by diff column
+	for j := 2; j < len(sRows); j++ {
+		// init used data
+		columnValue := f.GetCellValue(sheetName, column+strconv.Itoa(j))
+		file := outFiles[columnValue].file
+		count := outFiles[columnValue].count
+
+		// set row to specific file
+		outFiles[columnValue].file.SetSheetRow(sheetName, "A"+strconv.Itoa(count), &sRows[j-1])
+
+		// update file obj
+		count++
+		outFiles[columnValue] = File{file: file, count: count}
+	}
+
+	// save all sub files
+	for c, f := range outFiles {
+		if err = f.file.SaveAs(filePath + outputFilePath + c + ".xlsx"); err != nil {
 			return
 		}
 	}
