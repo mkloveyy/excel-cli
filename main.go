@@ -19,6 +19,8 @@ func main() {
 
 	var length int
 
+	var ownerColumn, companyColumn string
+
 	excelCli := &cli.App{
 		Name:     "excel-cli",
 		Version:  "v1.0.0",
@@ -138,15 +140,47 @@ func main() {
 						Usage:       "name of the column",
 						Destination: &column,
 					},
-					&cli.StringFlag{
-						Name:    "username",
-						Aliases: []string{"u"},
-						Value:   "",
-						Usage:   "user defined config",
-					},
 				},
 				Action: func(c *cli.Context) error {
 					return commands.Classify(rootPath, fileName, sheetName, filePath, column)
+				},
+			},
+			{
+				Name:    "correct",
+				Aliases: []string{"ct"},
+				Usage:   "correct owner of company",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "file-name",
+						Aliases:     []string{"fn"},
+						Value:       "test.xlsx",
+						Usage:       "name of pending files to be split",
+						Destination: &fileName,
+					},
+					&cli.StringFlag{
+						Name:        "sheet-name",
+						Aliases:     []string{"sn"},
+						Value:       "数据源",
+						Usage:       "name of file sheet to be split",
+						Destination: &sheetName,
+					},
+					&cli.StringFlag{
+						Name:        "owner-column",
+						Aliases:     []string{"oc"},
+						Value:       "",
+						Usage:       "column of owner",
+						Destination: &ownerColumn,
+					},
+					&cli.StringFlag{
+						Name:        "company-column",
+						Aliases:     []string{"cc"},
+						Value:       "",
+						Usage:       "column of company",
+						Destination: &companyColumn,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					return commands.Correct(rootPath, fileName, sheetName, ownerColumn, companyColumn)
 				},
 			},
 		},
