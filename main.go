@@ -19,6 +19,8 @@ func main() {
 
 	var length int
 
+	var username string
+
 	excelCli := &cli.App{
 		Name:     "excel-cli",
 		Version:  "v1.0.0",
@@ -137,9 +139,16 @@ func main() {
 						Usage:       "name of the column",
 						Destination: &column,
 					},
+					&cli.StringFlag{
+						Name:        "username",
+						Aliases:     []string{"u"},
+						Value:       "",
+						Usage:       "user defined config",
+						Destination: &username,
+					},
 				},
 				Action: func(c *cli.Context) error {
-					return commands.Classify(rootPath, fileName, sheetName, filePath, column)
+					return commands.Classify(rootPath, fileName, sheetName, filePath, column, username)
 				},
 			},
 		},

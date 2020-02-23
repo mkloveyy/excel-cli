@@ -9,7 +9,7 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
-func Classify(filePath string, inputFileName string, sheetName string, outputFilePath string, column string) (err error) {
+func Classify(filePath string, inputFileName string, sheetName string, outputFilePath string, column string, username string) (err error) {
 	if len(column) > 1 {
 		return errors.New("wrong column value")
 	}
@@ -24,8 +24,6 @@ func Classify(filePath string, inputFileName string, sheetName string, outputFil
 	sRows := f.GetRows(sheetName)
 	// get sheet title
 	sTitle := sRows[0]
-	// get sheet data list
-	sRows = sRows[1:]
 
 	//total := len(sRows)
 
@@ -48,7 +46,9 @@ func Classify(filePath string, inputFileName string, sheetName string, outputFil
 		}
 	}
 
-	fmt.Println(len(columnList))
+	// Output some message
+	fmt.Println(fmt.Sprintf("file count: %d", len(columnList)))
+	fmt.Println("column list: ", columnList)
 
 	// make sure output file path exists
 	if err = os.MkdirAll(filePath+outputFilePath, os.ModePerm); err != nil {
@@ -66,7 +66,7 @@ func Classify(filePath string, inputFileName string, sheetName string, outputFil
 
 		for j := 2; j < len(sRows); j++ {
 			if f.GetCellValue(sheetName, column+strconv.Itoa(j)) == columnValue {
-				newFile.SetSheetRow(sheetName, "A"+strconv.Itoa(k), &sRows[j])
+				newFile.SetSheetRow(sheetName, "A"+strconv.Itoa(k), &sRows[j-1])
 				k++
 			}
 		}
